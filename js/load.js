@@ -16,10 +16,9 @@ var loadState = {
         game.load.spritesheet('enemy', 'img/enemy.png', 24,40)
         game.load.spritesheet('player', 'img/player.png', 24, 32)
 
-        game.load.crossOrigin = false
-        game.load.audio('getitem', 'sfx/getitem.ogg')
-        game.load.audio('loseitem', 'sfx/loseitem.ogg')
-        game.load.audio('music', 'sfx/music.ogg')
+        game.load.audio('getitem','sfx/getitem.ogg' ) //''http://gustavoasilveira.github.io/content/labirinto3/sound/getitem.ogg
+        game.load.audio('loseitem','sfx/loseitem.ogg') // ''http://gustavoasilveira.github.io/content/labirinto3/sound/lose.ogg
+        game.load.audio('music','sfx/music.ogg') // ''http://gustavoasilveira.github.io/content/labirinto3/sound/music.ogg
 
         game.physics.startSystem(Phaser.Physics.ARCADE)
     },

@@ -1,5 +1,6 @@
 var stage1State = {
     create: function(){
+        this.onGame = true
         this.music = game.add.audio('music')
         this.music.loop = true
         this.music.volume = 1        
@@ -92,6 +93,12 @@ var stage1State = {
         this.coins = 0
         this.txtCoins = game.add.text(15,15, 'COINS: ' + this.getText(this.coins), {font: '15px emulogic', fill: '#fff'})
 
+
+        //exibir score
+        this.txtScore = 
+        game.add.text(game.world.centerX, 15, 'SCORE ' + this.getText(game.global.score), {font: '15px emulogic', fill: '#fff'})
+
+        this.txtScore.anchor.set(.5, 0)
         //Controler
         this.controls = game.input.keyboard.createCursorKeys()
 
@@ -102,19 +109,68 @@ var stage1State = {
         this.emitter.setYSpeed(-50, 50)
         this.emitter.gravity.y = 0
 
+        //Timer
+        this.time = 10 
+        this.txtTimer = game.add.text(game.world.width - 15,15, 'TIME: ' + this.getText(this.time), {font: '15px emulogic', fill: '#fff'})
+        this.txtTimer.anchor.set(1,0)
+        this.timer = game.time.events.loop(1000, function(){
+            this.time--
+            this.txtTimer.text = 'TIME: ' + this.getText(this.time)
+        }, this)
     },
+
+    
 
     //Função que ocorre a cada mudança
     update: function(){
-        //Declara que o player e os blocos são "fisicos" e colidem
-        game.physics.arcade.collide(this.player, this.blocks)
-        //Declara que o player e as moedas são "fisicas" e quando você passa por cima, dispara a função (ultimo parametro função verificadora)
-        game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
-        //Colisão do player com o inimigo
-        game.physics.arcade.overlap(this.player, this.enemy, this.loseCoin, null, this)
+        if(this.onGame){
+            //Declara que o player e os blocos são "fisicos" e colidem
+            game.physics.arcade.collide(this.player, this.blocks)
+            //Declara que o player e as moedas são "fisicas" e quando você passa por cima, dispara a função (ultimo parametro função verificadora)
+            game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
+            //Colisão do player com o inimigo
+            game.physics.arcade.overlap(this.player, this.enemy, this.loseCoin, null, this)
+    
+            this.movePlayer()
+            this.moveEnemy()
+    
+            if(this.time < 1 | this.coins >= 10){
+                this.gameOver()
+            }
+        }
+    },
 
-        this.movePlayer()
-        this.moveEnemy()
+    gameOver: function(){
+        this.onGame = false
+        game.time.events.remove(this.timer)
+        this.player.body.velocity.x = 0
+        this.player.body.velocity.y = 0
+        this.player.animations.stop()
+        this.player.frame = 0
+
+        this.enemy.animations.stop()
+        this.enemy.frame = 0
+
+        //Passou de fase
+        if(this.coins >= 10){
+            
+        }else{
+            //Acabou o tempo
+            var txtGameOver = game.add.text(game.world.centerX, 150, 'GAME OVER', {font: '20px emulogic', fill: "#fff"})
+            txtGameOver.anchor.set(.5)
+        }
+        var txtBestScore = 
+        game.add.text(game.world.centerX, 350, 'BEST SCORE: ' + this.getText(game.global.hightScore), {font: '20px emulogic', fill: "#fff"})
+        txtBestScore.anchor.set(.5)
+
+        game.time.events.add(5000, function(){
+            if(this.coins >= 10){
+                
+            }else{
+                // this.music.stop()
+                game.state.start('menu')
+            }
+        })
     },
 
     loseCoin: function(){
@@ -184,13 +240,20 @@ var stage1State = {
         this.emitter.y = this.player.position.y
         //Cria a colição caso tenha moedas a perder
         this.emitter.start(true, 500, null, 15)
-        
+
         //Toca o som de pegar a moeda
         this.sndCoin.play()
         //Aumenta o coin pra + 1
         this.coins++
         //Altera o texto para coins novamente (coin + 1)
         this.txtCoins.text = 'COINS: ' + this.getText(this.coins)
+
+        game.global.score += 5
+        this.txtScore.text = 'SCORE: '+ this.getText(game.global.score)
+
+        if(game.global.score > game.global.hightScore){
+            game.global.hightScore = game.global.score
+        }
         //Da uma nova posição para o coin
         this.coin.position = this.newPosition()
     },
