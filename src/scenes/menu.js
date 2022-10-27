@@ -1,5 +1,10 @@
-var menuState = {
-    create: function(){
+import { Scene } from "phaser"
+
+class menuState extends Scene {
+    constructor() {
+        super("menu");
+    }
+    create(){
         this.music = game.add.audio('music')
         this.music.loop = true
         this.music.volume = 1        
@@ -37,10 +42,12 @@ var menuState = {
             var enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
             enterKey.onDown.addOnce(this.startGame, this)
         }, this)      
-    },
+    }
 
-    startGame: function(){
+    startGame(){
         this.music.stop()
         game.state.start('stage1')
     }
 };
+
+export default menuState

@@ -1,5 +1,10 @@
-var endState = {
-    create: function(){
+import { Scene } from "phaser"
+
+class endState extends Scene {
+    constructor() {
+        super("end");
+    }
+    create(){
         game.add.sprite(0,0, 'end')
         var txtPressStart = game.add.text(game.world.centerX, 200, 'PRESS START', {font: '20px emulogic', fill: '#f00'})
         txtPressStart.anchor.set(.5)
@@ -10,11 +15,13 @@ var endState = {
             var enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
             enterKey.onDown.addOnce(this.backToMenu, this)
         },this)
-    },
+    }
 
-    backToMenu: function(){
+    backToMenu() {
         game.state.start('menu')
     }
 
 
 };
+
+export default endState

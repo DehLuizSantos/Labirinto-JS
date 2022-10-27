@@ -1,5 +1,10 @@
-var stage2State = {
-	create: function(){
+import { Scene } from "phaser"
+
+class stage2State extends Scene {
+	constructor() {
+        super("stage2");
+    }
+	create(){
 		this.onGame = true;
 		//Música e sons
 		this.music = game.add.audio('music');
@@ -107,9 +112,9 @@ var stage2State = {
 			this.time--;
 			this.txtTimer.text = 'TIME: ' + this.getText(this.time);
 		},this);
-	},
+	}
 	
-	update: function(){
+	update(){
 		if(this.onGame){
 			game.physics.arcade.collide(this.player,this.blocks);
 			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
@@ -122,9 +127,9 @@ var stage2State = {
 				this.gameOver();
 			}
 		}
-	},
+	}
 	
-	gameOver: function(){
+	gameOver(){
 		this.onGame = false;
 		
 		game.time.events.remove(this.timer);
@@ -171,9 +176,9 @@ var stage2State = {
 				game.state.start('menu');
 			}
 		},this);
-	},
+	}
 	
-	loseCoin: function(){
+	loseCoin(){
 		this.sndLoseCoin.play();
 		
 		if(this.coins > 0){
@@ -184,9 +189,9 @@ var stage2State = {
 			this.coins = 0;
 			this.txtCoins.text = 'COINS: ' + this.getText(this.coins);
 		}
-	},
+	}
 	
-	moveEnemy: function(){
+	moveEnemy(){
 		if(Math.floor(this.enemy.x -25)%50 === 0 && Math.floor(this.enemy.y -25)%50 === 0){
 			var enemyCol = Math.floor(this.enemy.x/50);
 			var enemyRow = Math.floor(this.enemy.y/50);
@@ -227,9 +232,9 @@ var stage2State = {
 				break;
 			
 		}
-	},
+	}
 	
-	getCoin: function(){
+	getCoin(){
 		this.emitter.x = this.coin.position.x;
 		this.emitter.y = this.coin.position.y;
 		this.emitter.start(true,500,null,15);
@@ -246,9 +251,9 @@ var stage2State = {
 		}
 		
 		this.coin.position = this.newPosition();
-	},
+	}
 	
-	getText: function(value){
+	getText(value){
 		if(value < 10){
 			return '00' + value.toString();
 		}
@@ -256,9 +261,9 @@ var stage2State = {
 			return '0' + value.toString();
 		}
 		return value.toString();
-	},
+	}
 	
-	movePlayer: function(){
+	movePlayer(){
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 	
@@ -294,9 +299,9 @@ var stage2State = {
 		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
 			this.player.animations.stop();
 		}
-	},
+	}
 	
-	newPosition: function(){
+	newPosition(){
 		var pos = this.coinPositions[Math.floor(Math.random() * this.coinPositions.length)];
 		
 		while(this.coin.position === pos){
@@ -306,3 +311,5 @@ var stage2State = {
 		return pos;
 	}
 };
+
+export default stage2State
