@@ -1,4 +1,6 @@
 var loadState = {
+
+   
     preload: function(){
         var txtLoading = game.add.text(game.world.centerX, 150, 'LOADING...', {font: '15px emulogic', fill: '#fff'})
         txtLoading.anchor.set(.5)

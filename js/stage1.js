@@ -16,16 +16,17 @@ var stage1State = {
 		game.add.sprite(0,0,'bg');
 		
 		this.maze = [
-			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-			[1,3,0,0,0,0,0,0,0,0,0,0,0,3,1],
-			[1,0,1,1,0,1,0,1,1,1,0,1,1,0,1],
-			[1,0,1,3,0,1,3,0,0,1,0,3,1,0,1],
-			[1,0,0,0,1,1,1,1,0,1,0,1,1,0,1],
-			[1,0,0,0,0,1,0,2,0,0,0,0,0,0,1],
-			[1,0,1,3,0,0,0,0,1,0,0,3,1,0,1],
-			[1,0,1,1,1,1,0,1,1,0,1,1,1,0,1],
-			[1,3,0,0,0,0,0,3,1,0,0,0,0,3,1],
-			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+			[1,3,0,0,0,0,0,0,0,0,0,0,0,3,1,1],
+			[1,0,1,1,0,1,0,1,1,1,0,1,1,0,1,1],
+			[1,0,1,3,0,1,3,0,0,1,0,3,1,0,1,1],
+			[1,0,0,0,1,1,1,1,0,1,0,1,1,0,1,1],
+			[1,0,0,0,0,1,0,2,0,0,0,0,0,0,1,1],
+			[1,0,1,3,0,0,0,0,1,0,0,3,1,0,1,1],
+			[1,0,1,1,1,1,0,1,1,0,1,1,1,0,1,1],
+			[1,3,0,0,0,0,0,3,1,0,0,0,0,3,1,1],
+			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 		];
 		
 		this.blocks = game.add.group();
@@ -107,6 +108,7 @@ var stage1State = {
 			this.time--;
 			this.txtTimer.text = 'TIME: ' + this.getText(this.time);
 		},this);
+		console.log(this)
 	},
 	
 	update: function(){
@@ -114,7 +116,7 @@ var stage1State = {
 			game.physics.arcade.collide(this.player,this.blocks);
 			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
-		
+			// game.cameras.main.startFollow(this.player);
 			this.moveEnemy();
 			this.movePlayer();
 			
