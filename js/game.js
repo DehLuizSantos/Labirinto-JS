@@ -1,7 +1,3 @@
-
-
-
-
 var game = new Phaser.Game(750,500,Phaser.CANVAS);
 	game.global = {
 		score: 0,

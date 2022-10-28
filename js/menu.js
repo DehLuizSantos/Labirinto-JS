@@ -35,6 +35,9 @@ var menuState = {
             //HightScore na tela inicial aparece depois de 0.5s e fica piscando em loop
             game.add.tween(txtHightScore).to({alpha: 1}, 500).to({alpha: 0}, 500).loop().start()
             var enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
+           /*  var pointer = game.input.activePointer;
+            pointer.backButton.onDown.addOnce(this.startGame, this)
+            console.log(pointer) */
             enterKey.onDown.addOnce(this.startGame, this)
         }, this)      
     },

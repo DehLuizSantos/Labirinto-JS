@@ -93,6 +93,7 @@ var stage1State = {
 		//controles
 		this.controls = game.input.keyboard.createCursorKeys();
 		
+		
 		//Partículas
 		this.emitter = game.add.emitter(0,0,15);
 		this.emitter.makeParticles('part');
@@ -108,7 +109,6 @@ var stage1State = {
 			this.time--;
 			this.txtTimer.text = 'TIME: ' + this.getText(this.time);
 		},this);
-		console.log(this)
 	},
 	
 	update: function(){
@@ -116,12 +116,17 @@ var stage1State = {
 			game.physics.arcade.collide(this.player,this.blocks);
 			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
-			// game.cameras.main.startFollow(this.player);
 			this.moveEnemy();
 			this.movePlayer();
 			
 			if(this.time < 1 || this.coins >= 10){
 				this.gameOver();
+			}
+
+			if(window.innerWidth < 700){
+				console.log('aqui')
+				this.gameControlsMobile = game.add.text(game.world.centerX,150,'exemplo: ' + this.getText(game.global.score),{font:'15px emulogic',fill:'#fff'})
+				this.txtScore.anchor.set(.9,0);
 			}
 		}
 	},
