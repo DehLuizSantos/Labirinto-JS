@@ -6,6 +6,8 @@ var stage1State = {
 		this.music.loop = true;
 		this.music.volume = .5;
 		this.music.play();
+
+		
 		
 		this.sndCoin = game.add.audio('getitem');
 		this.sndCoin.volume = .5;
@@ -48,6 +50,7 @@ var stage1State = {
 				if(tile === 2){
 					this.player = game.add.sprite(x + 25,y + 25,'player');
 					this.player.anchor.set(.5);
+					this.player.lastAngle = 0;
 					game.physics.arcade.enable(this.player);
 					this.player.animations.add('goDown',[0,1,2,3,4,5,6,7],12,true);
 					this.player.animations.add('goUp',[8,9,10,11,12,13,14,15],12,true);
@@ -63,6 +66,24 @@ var stage1State = {
 				}
 			}
 		}
+
+		//GamePadMobile
+		// Add the VirtualGamepad plugin to the game
+		this.gamepad = this.game.plugins.add(Phaser.Plugin.VirtualGamepad);
+        
+		// Add a joystick to the game (only one is allowed right now)
+		this.joystick = this.gamepad.addJoystick(game.world.width / 2, game.world.height / 2, 1.2, 'gamepad');
+		this.joystick.anchor.set(0.5);
+		
+			
+		// Add a button to the game (only one is allowed right now)
+		this.button = this.gamepad.addButton(game.world.centerX, game.world.centerY, 1.0, 'gamepad');
+		this.button.anchor.set(0.5);
+
+		
+        this.player.body.acceleration.x = 4 * this.joystick.properties.x;
+        this.player.body.acceleration.y = 4 * this.joystick.properties.y;
+
 		
 		//Inimigo
 		this.enemy = game.add.sprite(75,75,'enemy');
@@ -119,15 +140,119 @@ var stage1State = {
 			this.moveEnemy();
 			this.movePlayer();
 			
-			if(this.time < 1 || this.coins >= 10){
+			if(this.time === 0 || this.coins >= 10){
 				this.gameOver();
 			}
+			// Read joystick data to set ship's angle and acceleration
+			if(this.joystick.properties.inUse){
+				this.movePlayerJoystick()
+        	}else{
+				this.player.body.velocity.x = 0
+				this.player.body.velocity.y = 0
 
-			if(window.innerWidth < 700){
-				console.log('aqui')
-				this.gameControlsMobile = game.add.text(game.world.centerX,150,'exemplo: ' + this.getText(game.global.score),{font:'15px emulogic',fill:'#fff'})
-				this.txtScore.anchor.set(.9,0);
 			}
+		}
+	},
+
+	movePlayerJoystick: function(){
+		this.player.body.velocity.x = 0;
+		this.player.body.velocity.y = 0;
+		if(this.joystick.properties.left && !this.joystick.properties.right){
+			this.player.body.velocity.x = -100
+			this.player.direction = "left";
+		}
+		if(this.joystick.properties.right && !this.joystick.properties.left){
+			this.player.body.velocity.x = 100
+			this.player.direction = "right";
+		}
+		if(this.joystick.properties.up && !this.joystick.properties.down){
+			this.player.body.velocity.y = -100
+			this.player.direction = "up";
+		}
+		if(this.joystick.properties.down && !this.joystick.properties.up){
+			this.player.body.velocity.y = 100
+			this.player.direction = "down";
+		}
+	},
+
+	movePlayer: function(){
+		this.player.body.velocity.x = 0;
+		this.player.body.velocity.y = 0;
+	
+		if(this.controls.left.isDown && !this.controls.right.isDown){
+			this.player.body.velocity.x = -100;
+			this.player.direction = "left";
+		} else
+		if(this.controls.right.isDown && !this.controls.left.isDown){
+			this.player.body.velocity.x = 100;
+			this.player.direction = "right";
+		}
+		
+		if(this.controls.up.isDown && !this.controls.down.isDown){
+			this.player.body.velocity.y = -100;
+			this.player.direction = "up";
+		} else
+		if(this.controls.down.isDown && !this.controls.up.isDown){
+			this.player.body.velocity.y = 100;
+			this.player.direction = "down";
+		}
+		
+		switch(this.player.direction){
+			case "left":
+				this.player.animations.play('goLeft'); break;
+			case "right":
+				this.player.animations.play('goRight'); break;
+			case "up":
+				this.player.animations.play('goUp'); break;
+			case "down":
+				this.player.animations.play('goDown'); break;
+		}
+		
+		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
+			this.player.animations.stop();
+		}
+	},
+
+	moveEnemy: function(){
+		if(Math.floor(this.enemy.x -25)%50 === 0 && Math.floor(this.enemy.y -25)%50 === 0){
+			var enemyCol = Math.floor(this.enemy.x/50);
+			var enemyRow = Math.floor(this.enemy.y/50);
+			var validPath = [];
+			
+			if(this.maze[enemyRow][enemyCol-1] !== 1 && this.enemy.direction !== 'RIGHT'){
+				validPath.push('LEFT');
+			}
+			if(this.maze[enemyRow][enemyCol+1] !== 1 && this.enemy.direction !== 'LEFT'){
+				validPath.push('RIGHT');
+			}
+			if(this.maze[enemyRow-1][enemyCol] !== 1 && this.enemy.direction !== 'DOWN'){
+				validPath.push('UP');
+			}
+			if(this.maze[enemyRow+1][enemyCol] !== 1 && this.enemy.direction !== 'UP'){
+				validPath.push('DOWN');
+			}
+			
+			this.enemy.direction = validPath[Math.floor(Math.random()*validPath.length)];
+		}
+		
+		switch(this.enemy.direction){
+			case 'LEFT':
+				this.enemy.x -= 1;
+				this.enemy.animations.play('goLeft');
+				break;
+			case 'RIGHT':
+				this.enemy.x += 1;
+				this.enemy.animations.play('goRight');
+				break;
+			case 'UP':
+				this.enemy.y -= 1;
+				this.enemy.animations.play('goUp');
+				break;
+			case 'DOWN':
+				this.enemy.y += 1;
+				this.enemy.animations.play('goDown');
+				break;
+			
 		}
 	},
 	
@@ -194,48 +319,7 @@ var stage1State = {
 		}
 	},
 	
-	moveEnemy: function(){
-		if(Math.floor(this.enemy.x -25)%50 === 0 && Math.floor(this.enemy.y -25)%50 === 0){
-			var enemyCol = Math.floor(this.enemy.x/50);
-			var enemyRow = Math.floor(this.enemy.y/50);
-			var validPath = [];
-			
-			if(this.maze[enemyRow][enemyCol-1] !== 1 && this.enemy.direction !== 'RIGHT'){
-				validPath.push('LEFT');
-			}
-			if(this.maze[enemyRow][enemyCol+1] !== 1 && this.enemy.direction !== 'LEFT'){
-				validPath.push('RIGHT');
-			}
-			if(this.maze[enemyRow-1][enemyCol] !== 1 && this.enemy.direction !== 'DOWN'){
-				validPath.push('UP');
-			}
-			if(this.maze[enemyRow+1][enemyCol] !== 1 && this.enemy.direction !== 'UP'){
-				validPath.push('DOWN');
-			}
-			
-			this.enemy.direction = validPath[Math.floor(Math.random()*validPath.length)];
-		}
-		
-		switch(this.enemy.direction){
-			case 'LEFT':
-				this.enemy.x -= 1;
-				this.enemy.animations.play('goLeft');
-				break;
-			case 'RIGHT':
-				this.enemy.x += 1;
-				this.enemy.animations.play('goRight');
-				break;
-			case 'UP':
-				this.enemy.y -= 1;
-				this.enemy.animations.play('goUp');
-				break;
-			case 'DOWN':
-				this.enemy.y += 1;
-				this.enemy.animations.play('goDown');
-				break;
-			
-		}
-	},
+	
 	
 	getCoin: function(){
 		this.emitter.x = this.coin.position.x;
@@ -266,43 +350,7 @@ var stage1State = {
 		return value.toString();
 	},
 	
-	movePlayer: function(){
-		this.player.body.velocity.x = 0;
-		this.player.body.velocity.y = 0;
 	
-		if(this.controls.left.isDown && !this.controls.right.isDown){
-			this.player.body.velocity.x = -100;
-			this.player.direction = "left";
-		} else
-		if(this.controls.right.isDown && !this.controls.left.isDown){
-			this.player.body.velocity.x = 100;
-			this.player.direction = "right";
-		}
-		
-		if(this.controls.up.isDown && !this.controls.down.isDown){
-			this.player.body.velocity.y = -100;
-			this.player.direction = "up";
-		} else
-		if(this.controls.down.isDown && !this.controls.up.isDown){
-			this.player.body.velocity.y = 100;
-			this.player.direction = "down";
-		}
-		
-		switch(this.player.direction){
-			case "left":
-				this.player.animations.play('goLeft'); break;
-			case "right":
-				this.player.animations.play('goRight'); break;
-			case "up":
-				this.player.animations.play('goUp'); break;
-			case "down":
-				this.player.animations.play('goDown'); break;
-		}
-		
-		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
-			this.player.animations.stop();
-		}
-	},
 	
 	newPosition: function(){
 		var pos = this.coinPositions[Math.floor(Math.random() * this.coinPositions.length)];

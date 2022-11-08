@@ -21,10 +21,18 @@ var loadState = {
         game.load.audio('getitem','sfx/getitem.ogg' ) //''http://gustavoasilveira.github.io/content/labirinto3/sound/getitem.ogg
         game.load.audio('loseitem','sfx/loseitem.ogg') // ''http://gustavoasilveira.github.io/content/labirinto3/sound/lose.ogg
         game.load.audio('music','sfx/music.ogg') // ''http://gustavoasilveira.github.io/content/labirinto3/sound/music.ogg
+         // Load the gamepad spritesheet. Note that the width must equal height
+        // of the sprite.
+        this.load.spritesheet('gamepad', 
+            'img/gamepad_spritesheet.png', 100, 100);
 
         game.physics.startSystem(Phaser.Physics.ARCADE)
     },
     create: function(){
+        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		this.scale.pageAlignHorizontally = true;
+		this.scale.pageAlignVertically = true;
+     
         game.state.start('menu')
     }
 };
