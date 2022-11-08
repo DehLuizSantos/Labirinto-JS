@@ -147,12 +147,15 @@ var stage1State = {
 			if(game.device.android || game.device.iPhone){
 				if(this.joystick.properties.inUse){
 					this.movePlayerJoystick()
-				}else{
-					this.movePlayer();
 				}
 			}else{
 				this.movePlayer();
 			}
+		}else{
+			this.player.body.velocity.x = 0
+			this.player.body.velocity.y = 0
+			this.player.animations.play('goDown')
+			this.player.animations.stop()
 		}
 	},
 
@@ -185,10 +188,7 @@ var stage1State = {
 			case "down":
 				this.player.animations.play('goDown'); break;
 		}
-		
-		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
-			this.player.animations.stop();
-		}
+	
 	},
 
 	movePlayer: function(){
@@ -224,9 +224,7 @@ var stage1State = {
 				this.player.animations.play('goDown'); break;
 		}
 		
-		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
-			this.player.animations.stop();
-		}
+		
 	},
 
 	moveEnemy: function(){
@@ -273,7 +271,6 @@ var stage1State = {
 	},
 	
 	gameOver: function(){
-		this.onGame = false;
 		
 		game.time.events.remove(this.timer);
 		
@@ -285,6 +282,7 @@ var stage1State = {
 		this.enemy.animations.stop();
 		this.enemy.frame = 0;
 		
+		this.onGame = false;
 		if(this.coins >= 5){//Passou de fase
 			var txtLevelComplete = game.add.text(game.world.centerX,150,'LEVEL COMPLETE',{font:'20px emulogic',fill:'#fff'});
 				txtLevelComplete.anchor.set(.5);

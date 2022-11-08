@@ -65,6 +65,8 @@ var stage2State = {
 				}
 			}
 		}
+
+		//GamePad plugin
 		if(game.device.android || game.device.iPhone){
 			//GamePadMobile
 			// Add the VirtualGamepad plugin to the game
@@ -132,6 +134,7 @@ var stage2State = {
 		},this);
 	},
 	
+	//Renderiza toda hora (tipo um useEffect)
 	update: function(){
 		if(this.onGame){
 			game.physics.arcade.collide(this.player,this.blocks);
@@ -152,6 +155,11 @@ var stage2State = {
 			}else{
 				this.movePlayer();
 			}
+		}else{
+			this.player.body.velocity.x = 0
+			this.player.body.velocity.y = 0
+			this.player.animations.play('goDown')
+			this.player.animations.stop()
 		}
 	},
 
@@ -185,9 +193,7 @@ var stage2State = {
 				this.player.animations.play('goDown'); break;
 		}
 		
-		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
-			this.player.animations.stop();
-		}
+		
 	},
 
 	movePlayer: function(){
@@ -223,9 +229,7 @@ var stage2State = {
 				this.player.animations.play('goDown'); break;
 		}
 		
-		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
-			this.player.animations.stop();
-		}
+		
 	},
 
 	moveEnemy: function(){
