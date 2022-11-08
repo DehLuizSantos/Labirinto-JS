@@ -10,6 +10,9 @@ var endState = {
             var enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
             enterKey.onDown.addOnce(this.backToMenu, this)
         },this)
+        game.time.events.add(5000, function(){
+            this.backToMenu()
+        }, this)  
     },
 
     backToMenu: function(){

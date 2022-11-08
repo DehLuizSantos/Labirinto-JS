@@ -6,6 +6,8 @@ var stage2State = {
 		this.music.loop = true;
 		this.music.volume = .5;
 		this.music.play();
+
+		
 		
 		this.sndCoin = game.add.audio('getitem');
 		this.sndCoin.volume = .5;
@@ -15,7 +17,7 @@ var stage2State = {
 		
 		game.add.sprite(0,0,'bg');
 		
-		this.maze = [
+		this.maze = [ 
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 			[1,0,0,0,0,0,1,3,0,0,0,0,0,3,1],
 			[1,0,1,3,1,0,1,1,0,1,1,1,1,0,1],
@@ -25,7 +27,7 @@ var stage2State = {
 			[1,0,0,1,0,0,0,0,0,0,0,1,3,0,1],
 			[1,0,1,1,0,1,1,0,1,1,0,1,1,0,1],
 			[1,0,3,0,0,1,3,0,3,1,0,0,0,0,1],
-			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] 
 		];
 		
 		this.blocks = game.add.group();
@@ -47,6 +49,7 @@ var stage2State = {
 				if(tile === 2){
 					this.player = game.add.sprite(x + 25,y + 25,'player');
 					this.player.anchor.set(.5);
+					this.player.lastAngle = 0;
 					game.physics.arcade.enable(this.player);
 					this.player.animations.add('goDown',[0,1,2,3,4,5,6,7],12,true);
 					this.player.animations.add('goUp',[8,9,10,11,12,13,14,15],12,true);
@@ -62,6 +65,25 @@ var stage2State = {
 				}
 			}
 		}
+		if(game.device.android || game.device.iPhone){
+			//GamePadMobile
+			// Add the VirtualGamepad plugin to the game
+			this.gamepad = this.game.plugins.add(Phaser.Plugin.VirtualGamepad);
+			
+			// Add a joystick to the game (only one is allowed right now)
+			this.joystick = this.gamepad.addJoystick(game.world.width / 2, game.world.height / 2, 1.2, 'gamepad');
+			this.joystick.anchor.set(0.5);
+			
+				
+			// Add a button to the game (only one is allowed right now)
+			this.button = this.gamepad.addButton(game.world.centerX, game.world.centerY, 1.0, 'gamepad');
+			this.button.anchor.set(0.5);
+			this.player.body.acceleration.x = 4 * this.joystick.properties.x;
+			this.player.body.acceleration.y = 4 * this.joystick.properties.y;
+		}
+
+		
+
 		
 		//Inimigo
 		this.enemy = game.add.sprite(75,75,'enemy');
@@ -92,6 +114,7 @@ var stage2State = {
 		//controles
 		this.controls = game.input.keyboard.createCursorKeys();
 		
+		
 		//Partículas
 		this.emitter = game.add.emitter(0,0,15);
 		this.emitter.makeParticles('part');
@@ -100,7 +123,7 @@ var stage2State = {
 		this.emitter.gravity.y = 0;
 		
 		//Timer
-		this.time = 100;
+		this.time = 50;
 		this.txtTimer = game.add.text(game.world.width - 15,15,'TIME: ' + this.getText(this.time),{font:'15px emulogic',fill:'#fff'});
 		this.txtTimer.anchor.set(1,0);
 		this.timer = game.time.events.loop(1000,function(){
@@ -114,78 +137,97 @@ var stage2State = {
 			game.physics.arcade.collide(this.player,this.blocks);
 			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
-		
 			this.moveEnemy();
-			this.movePlayer();
 			
-			if(this.time < 1 || this.coins >= 10){
+			if(this.time === 0 || this.coins >= 10){
 				this.gameOver();
 			}
+			// Read joystick data to set ship's angle and acceleration
+			if(game.device.android || game.device.iPhone){
+				if(this.joystick.properties.inUse){
+					this.movePlayerJoystick()
+				}else{
+					this.movePlayer();
+				}
+			}else{
+				this.movePlayer();
+			}
 		}
 	},
-	
-	gameOver: function(){
-		this.onGame = false;
+
+	movePlayerJoystick: function(){		
+		this.player.body.velocity.x = 0
+		this.player.body.velocity.y = 0
+		if(this.joystick.properties.left && !this.joystick.properties.right){
+			this.player.body.velocity.x = -100
+			this.player.direction = "left";
+		}else
+		if(this.joystick.properties.right && !this.joystick.properties.left){
+			this.player.body.velocity.x = 100
+			this.player.direction = "right";
+		}else
+		if(this.joystick.properties.up && !this.joystick.properties.down){
+			this.player.body.velocity.y = -100
+			this.player.direction = "up";
+		}else
+		if(this.joystick.properties.down && !this.joystick.properties.up){
+			this.player.body.velocity.y = 100
+			this.player.direction = "down";
+		}
+		switch(this.player.direction){
+			case "left":
+				this.player.animations.play('goLeft', true); break;
+			case "right":
+				this.player.animations.play('goRight'); break;
+			case "up":
+				this.player.animations.play('goUp'); break;
+			case "down":
+				this.player.animations.play('goDown'); break;
+		}
 		
-		game.time.events.remove(this.timer);
-		
+		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
+			this.player.animations.stop();
+		}
+	},
+
+	movePlayer: function(){
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
-		this.player.animations.stop();
-		this.player.frame = 0;
-		
-		this.enemy.animations.stop();
-		this.enemy.frame = 0;
-		
-		if(this.coins >= 10){//Passou de fase
-			var txtLevelComplete = game.add.text(game.world.centerX,150,'LEVEL COMPLETE',{font:'20px emulogic',fill:'#fff'});
-				txtLevelComplete.anchor.set(.5);
-				
-			var bonus = this.time * 5;
-			game.global.score += bonus;
-			this.txtScore.text = 'SCORE: ' + this.getText(game.global.score);
-			
-			if(game.global.score > game.global.highScore){
-				game.global.highScore = game.global.score;
-			}
-			
-			var txtBonus = game.add.text(game.world.centerX,200,'TIME BONUS: ' + this.getText(bonus),{font:'20px emulogic',fill:'#fff'});
-				txtBonus.anchor.set(.5);
-				
-			var txtFinalScore = game.add.text(game.world.centerX,250,'FINAL SCORE: ' + this.getText(game.global.score),{font:'20px emulogic',fill:'#fff'});
-				txtFinalScore.anchor.set(.5);
-			
-		} else {//Acabou o tempo
-			var txtGameOver = game.add.text(game.world.centerX,150,'GAME OVER',{font:'20px emulogic',fill:'#fff'});
-				txtGameOver.anchor.set(.5);
+	
+		if(this.controls.left.isDown && !this.controls.right.isDown){
+			this.player.body.velocity.x = -100;
+			this.player.direction = "left";
+		} else
+		if(this.controls.right.isDown && !this.controls.left.isDown){
+			this.player.body.velocity.x = 100;
+			this.player.direction = "right";
 		}
 		
-		var txtBestScore = game.add.text(game.world.centerX,350,'BEST SCORE: ' + this.getText(game.global.highScore),{font:'20px emulogic',fill:'#fff'});
-			txtBestScore.anchor.set(.5);
-			
-		game.time.events.add(5000,function(){
-			this.music.stop();
-			if(this.coins >= 10){
-				game.state.start('end');
-			} else {
-				game.state.start('menu');
-			}
-		},this);
-	},
-	
-	loseCoin: function(){
-		this.sndLoseCoin.play();
+		if(this.controls.up.isDown && !this.controls.down.isDown){
+			this.player.body.velocity.y = -100;
+			this.player.direction = "up";
+		} else
+		if(this.controls.down.isDown && !this.controls.up.isDown){
+			this.player.body.velocity.y = 100;
+			this.player.direction = "down";
+		}
 		
-		if(this.coins > 0){
-			this.emitter.x = this.player.position.x;
-			this.emitter.y = this.player.position.y;
-			this.emitter.start(true,500,null,15);
-			
-			this.coins = 0;
-			this.txtCoins.text = 'COINS: ' + this.getText(this.coins);
+		switch(this.player.direction){
+			case "left":
+				this.player.animations.play('goLeft'); break;
+			case "right":
+				this.player.animations.play('goRight'); break;
+			case "up":
+				this.player.animations.play('goUp'); break;
+			case "down":
+				this.player.animations.play('goDown'); break;
+		}
+		
+		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
+			this.player.animations.stop();
 		}
 	},
-	
+
 	moveEnemy: function(){
 		if(Math.floor(this.enemy.x -25)%50 === 0 && Math.floor(this.enemy.y -25)%50 === 0){
 			var enemyCol = Math.floor(this.enemy.x/50);
@@ -229,6 +271,71 @@ var stage2State = {
 		}
 	},
 	
+	gameOver: function(){
+		this.onGame = false;
+		
+		game.time.events.remove(this.timer);
+		
+		this.player.body.velocity.x = 0;
+		this.player.body.velocity.y = 0;
+		this.player.animations.stop();
+		this.player.frame = 0;
+		
+		this.enemy.animations.stop();
+		this.enemy.frame = 0;
+		
+		if(this.coins >= 5){//Passou de fase
+			var txtLevelComplete = game.add.text(game.world.centerX,150,'LEVEL COMPLETE',{font:'20px emulogic',fill:'#fff'});
+				txtLevelComplete.anchor.set(.5);
+				
+			var bonus = this.time * 5;
+			game.global.score += bonus;
+			this.txtScore.text = 'SCORE: ' + this.getText(game.global.score);
+			
+			if(game.global.score > game.global.highScore){
+				game.global.highScore = game.global.score;
+			}
+			
+			var txtBonus = game.add.text(game.world.centerX,200,'TIME BONUS: ' + this.getText(bonus),{font:'20px emulogic',fill:'#fff'});
+				txtBonus.anchor.set(.5);
+				
+			var txtFinalScore = game.add.text(game.world.centerX,250,'FINAL SCORE: ' + this.getText(game.global.score),{font:'20px emulogic',fill:'#fff'});
+				txtFinalScore.anchor.set(.5);
+			
+		} else {//Acabou o tempo
+			var txtGameOver = game.add.text(game.world.centerX,150,'GAME OVER',{font:'20px emulogic',fill:'#fff'});
+				txtGameOver.anchor.set(.5);
+		}
+		
+		var txtBestScore
+         = game.add.text(game.world.centerX,350,'BEST SCORE: ' + this.getText(game.global.highScore),{font:'20px emulogic',fill:'#fff'});
+			txtBestScore.anchor.set(.5);
+			
+		game.time.events.add(5000,function(){
+			this.music.stop();
+			if(this.coins >= 5){
+				game.state.start('end');
+			} else {
+				game.state.start('menu');
+			}
+		},this);
+	},
+	
+	loseCoin: function(){
+		this.sndLoseCoin.play();
+		
+		if(this.coins > 0){
+			this.emitter.x = this.player.position.x;
+			this.emitter.y = this.player.position.y;
+			this.emitter.start(true,500,null,15);
+			
+			this.coins = 0;
+			this.txtCoins.text = 'COINS: ' + this.getText(this.coins);
+		}
+	},
+	
+	
+	
 	getCoin: function(){
 		this.emitter.x = this.coin.position.x;
 		this.emitter.y = this.coin.position.y;
@@ -258,43 +365,7 @@ var stage2State = {
 		return value.toString();
 	},
 	
-	movePlayer: function(){
-		this.player.body.velocity.x = 0;
-		this.player.body.velocity.y = 0;
 	
-		if(this.controls.left.isDown && !this.controls.right.isDown){
-			this.player.body.velocity.x = -100;
-			this.player.direction = "left";
-		} else
-		if(this.controls.right.isDown && !this.controls.left.isDown){
-			this.player.body.velocity.x = 100;
-			this.player.direction = "right";
-		}
-		
-		if(this.controls.up.isDown && !this.controls.down.isDown){
-			this.player.body.velocity.y = -100;
-			this.player.direction = "up";
-		} else
-		if(this.controls.down.isDown && !this.controls.up.isDown){
-			this.player.body.velocity.y = 100;
-			this.player.direction = "down";
-		}
-		
-		switch(this.player.direction){
-			case "left":
-				this.player.animations.play('goLeft'); break;
-			case "right":
-				this.player.animations.play('goRight'); break;
-			case "up":
-				this.player.animations.play('goUp'); break;
-			case "down":
-				this.player.animations.play('goDown'); break;
-		}
-		
-		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
-			this.player.animations.stop();
-		}
-	},
 	
 	newPosition: function(){
 		var pos = this.coinPositions[Math.floor(Math.random() * this.coinPositions.length)];
