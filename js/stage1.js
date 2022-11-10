@@ -73,14 +73,27 @@ var stage1State = {
 			
 			// Add a joystick to the game (only one is allowed right now)
 			this.joystick = this.gamepad.addJoystick(game.world.width / 2, game.world.height / 2, 1.2, 'gamepad');
+			this.joystick.visible = false
+		
+			
 			this.joystick.anchor.set(0.5);
 			
 				
 			// Add a button to the game (only one is allowed right now)
 			this.button = this.gamepad.addButton(game.world.centerX, game.world.centerY, 1.0, 'gamepad');
 			this.button.anchor.set(0.5);
+			this.button.visible = false
 			this.player.body.acceleration.x = 4 * this.joystick.properties.x;
 			this.player.body.acceleration.y = 4 * this.joystick.properties.y;
+
+			this.right = game.add.button(25 , game.world.height / 2, 'right')
+
+			this.right.anchor.set(0.5);
+
+			
+
+
+			
 		}
 
 		
@@ -132,6 +145,10 @@ var stage1State = {
 			this.txtTimer.text = 'TIME: ' + this.getText(this.time);
 		},this);
 	},
+
+	activeCursors: function(cursor){
+		console.log(cursor)
+	},
 	
 	update: function(){
 		if(this.onGame){
@@ -139,6 +156,11 @@ var stage1State = {
 			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
 			this.moveEnemy();
+
+			if(game.input.activePointer.x < 375){
+				console.log('Right')
+			}
+			
 			
 			if(this.time === 0 || this.coins >= 10){
 				this.gameOver();
@@ -162,6 +184,8 @@ var stage1State = {
 	movePlayerJoystick: function(){		
 		this.player.body.velocity.x = 0
 		this.player.body.velocity.y = 0
+
+		
 		if(this.joystick.properties.left && !this.joystick.properties.right){
 			this.player.body.velocity.x = -100
 			this.player.direction = "left";

@@ -12,6 +12,8 @@ var loadState = {
         game.load.image('block', 'img/block.png')
         game.load.image('end', 'img/end.png')
         game.load.image('part', 'img/part.png')
+        game.load.image('right', 'img/seta.png')
+
 
         //Carregamento de imagem por celula (dimenções alt/larg)
         game.load.spritesheet('coin', 'img/coin.png', 32,32) 

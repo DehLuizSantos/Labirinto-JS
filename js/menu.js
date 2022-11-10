@@ -40,10 +40,18 @@ var menuState = {
         var enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
         enterKey.onDown.addOnce(this.startGame, this)
 
+        
+
         //Entra no jogo automaticamente depois de 5s
         game.time.events.add(5000, function(){
             this.startGame()
         }, this)    
+    },
+
+    update: function(){
+        if(game.input.activePointer.isDown){
+            this.startGame()
+        }
     },
 
     startGame: function(){
