@@ -157,8 +157,11 @@ var stage1State = {
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
 			this.moveEnemy();
 
+			if(game.input.activePointer.x > 375){
+				this.movePlayerJoystick('right')
+			}
 			if(game.input.activePointer.x < 375){
-				console.log('Right')
+				console.log('left')
 			}
 			
 			
