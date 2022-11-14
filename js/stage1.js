@@ -90,10 +90,7 @@ var stage1State = {
 
 			this.right.anchor.set(0.5);
 
-			
-
-
-			
+			this.right.events.onInputDown.add(this.movePlayerJoystick, this)
 		}
 
 		
@@ -146,9 +143,8 @@ var stage1State = {
 		},this);
 	},
 
-	activeCursors: function(cursor){
-		console.log(cursor)
-	},
+	
+
 	
 	update: function(){
 		if(this.onGame){
@@ -157,13 +153,6 @@ var stage1State = {
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
 			this.moveEnemy();
 
-			if(game.input.activePointer.x > 375){
-				this.movePlayerJoystick('right')
-			}
-			if(game.input.activePointer.x < 375){
-				console.log('left')
-			}
-			
 			
 			if(this.time === 0 || this.coins >= 10){
 				this.gameOver();
