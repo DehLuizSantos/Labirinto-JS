@@ -64,7 +64,7 @@ var stage1State = {
 				}
 			}
 		}
-		/* if(game.device.android || game.device.iPhone){ */
+		if(game.device.android || game.device.iPhone){
 
 			//GamePadMobile
 			// Add the VirtualGamepad plugin to the game
@@ -87,7 +87,7 @@ var stage1State = {
 			this.down.events.onInputDown.add(this.movePlayerJoystick, this)
 
 
-		/* } */
+		}
 
 		
 
