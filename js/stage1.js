@@ -148,6 +148,7 @@ var stage1State = {
 			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
 			this.moveEnemy();
+			this.movePlayer()
 
 			
 			if(this.time === 0 || this.coins >= 10){
