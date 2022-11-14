@@ -134,7 +134,7 @@ var stage1State = {
 		this.emitter.gravity.y = 0;
 		
 		//Timer
-		this.time = 1000;
+		this.time = 100;
 		this.txtTimer = game.add.text(game.world.width - 15,15,'TIME: ' + this.getText(this.time),{font:'15px emulogic',fill:'#fff'});
 		this.txtTimer.anchor.set(1,0);
 		this.timer = game.time.events.loop(1000,function(){
@@ -384,3 +384,5 @@ var stage1State = {
 		return pos;
 	}
 };
+
+

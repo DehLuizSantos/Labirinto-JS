@@ -6,8 +6,6 @@ var stage2State = {
 		this.music.loop = true;
 		this.music.volume = .5;
 		this.music.play();
-
-		
 		
 		this.sndCoin = game.add.audio('getitem');
 		this.sndCoin.volume = .5;
@@ -18,6 +16,7 @@ var stage2State = {
 		game.add.sprite(0,0,'bg');
 		
 		this.maze = [ 
+			[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 			[1,0,0,0,0,0,1,3,0,0,0,0,0,3,1],
 			[1,0,1,3,1,0,1,1,0,1,1,1,1,0,1],
@@ -27,7 +26,11 @@ var stage2State = {
 			[1,0,0,1,0,0,0,0,0,0,0,1,3,0,1],
 			[1,0,1,1,0,1,1,0,1,1,0,1,1,0,1],
 			[1,0,3,0,0,1,3,0,3,1,0,0,0,0,1],
-			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] 
+			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
 		];
 		
 		this.blocks = game.add.group();
@@ -63,28 +66,33 @@ var stage2State = {
 					};
 					this.coinPositions.push(position);
 				}
+				if(tile === 4){
+					this.cursorsMobile = game.add.sprite(x,y, 'whitearea')
+				}
+				if(tile === 5){
+					this.header = game.add.sprite(x,y, 'blackarea')
+				}
 			}
 		}
 
-		//GamePad plugin
-		if(game.device.android || game.device.iPhone){
 			//GamePadMobile
 			// Add the VirtualGamepad plugin to the game
-			this.gamepad = this.game.plugins.add(Phaser.Plugin.VirtualGamepad);
-			
-			// Add a joystick to the game (only one is allowed right now)
-			this.joystick = this.gamepad.addJoystick(game.world.width / 2, game.world.height / 2, 1.2, 'gamepad');
-			this.joystick.anchor.set(0.5);
-			
-				
-			// Add a button to the game (only one is allowed right now)
-			this.button = this.gamepad.addButton(game.world.centerX, game.world.centerY, 1.0, 'gamepad');
-			this.button.anchor.set(0.5);
-			this.player.body.acceleration.x = 4 * this.joystick.properties.x;
-			this.player.body.acceleration.y = 4 * this.joystick.properties.y;
-		}
 
-		
+			this.right = game.add.button(game.world.width / 2 + 60, 680, 'right')
+			this.right.anchor.set(0.5);
+			this.right.events.onInputDown.add(this.movePlayerJoystick, this)
+
+			this.left = game.add.button(game.world.width / 2 - 60, 680, 'left')
+			this.left.anchor.set(0.5);
+			this.left.events.onInputDown.add(this.movePlayerJoystick, this)
+
+			this.up = game.add.button(game.world.width / 2, 630, 'up')
+			this.up.anchor.set(0.5);
+			this.up.events.onInputDown.add(this.movePlayerJoystick, this)
+
+			this.down = game.add.button(game.world.width / 2, 730, 'down')
+			this.down.anchor.set(0.5);
+			this.down.events.onInputDown.add(this.movePlayerJoystick, this)
 
 		
 		//Inimigo
@@ -125,7 +133,7 @@ var stage2State = {
 		this.emitter.gravity.y = 0;
 		
 		//Timer
-		this.time = 50;
+		this.time = 1000;
 		this.txtTimer = game.add.text(game.world.width - 15,15,'TIME: ' + this.getText(this.time),{font:'15px emulogic',fill:'#fff'});
 		this.txtTimer.anchor.set(1,0);
 		this.timer = game.time.events.loop(1000,function(){
@@ -133,28 +141,23 @@ var stage2State = {
 			this.txtTimer.text = 'TIME: ' + this.getText(this.time);
 		},this);
 	},
+
 	
-	//Renderiza toda hora (tipo um useEffect)
+
+	
 	update: function(){
 		if(this.onGame){
 			game.physics.arcade.collide(this.player,this.blocks);
 			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
 			this.moveEnemy();
+			// this.movePlayer()
+
 			
 			if(this.time === 0 || this.coins >= 10){
 				this.gameOver();
 			}
-			// Read joystick data to set ship's angle and acceleration
-			if(game.device.android || game.device.iPhone){
-				if(this.joystick.properties.inUse){
-					this.movePlayerJoystick()
-				}else{
-					this.movePlayer();
-				}
-			}else{
-				this.movePlayer();
-			}
+			
 		}else{
 			this.player.body.velocity.x = 0
 			this.player.body.velocity.y = 0
@@ -163,26 +166,26 @@ var stage2State = {
 		}
 	},
 
-	movePlayerJoystick: function(){		
+	movePlayerJoystick: function(direction){
 		this.player.body.velocity.x = 0
 		this.player.body.velocity.y = 0
-		if(this.joystick.properties.left && !this.joystick.properties.right){
-			this.player.body.velocity.x = -100
-			this.player.direction = "left";
-		}else
-		if(this.joystick.properties.right && !this.joystick.properties.left){
+
+ 		if(direction.key === 'right' && direction.key !== 'left'){
 			this.player.body.velocity.x = 100
-			this.player.direction = "right";
-		}else
-		if(this.joystick.properties.up && !this.joystick.properties.down){
-			this.player.body.velocity.y = -100
-			this.player.direction = "up";
-		}else
-		if(this.joystick.properties.down && !this.joystick.properties.up){
-			this.player.body.velocity.y = 100
-			this.player.direction = "down";
 		}
-		switch(this.player.direction){
+		if(direction.key === 'left' && direction.key !== 'right'){
+			this.player.body.velocity.x = -100
+		}
+		if(direction.key === 'up' && direction.key !== 'down'){
+			this.player.body.velocity.y = -100
+		}
+		if(direction.key === 'down' && direction.key !== 'up'){
+			this.player.body.velocity.y = 100
+		}
+
+		
+	
+		switch(direction.key){
 			case "left":
 				this.player.animations.play('goLeft', true); break;
 			case "right":
@@ -192,8 +195,7 @@ var stage2State = {
 			case "down":
 				this.player.animations.play('goDown'); break;
 		}
-		
-		
+	
 	},
 
 	movePlayer: function(){
@@ -276,7 +278,6 @@ var stage2State = {
 	},
 	
 	gameOver: function(){
-		this.onGame = false;
 		
 		game.time.events.remove(this.timer);
 		
@@ -288,6 +289,7 @@ var stage2State = {
 		this.enemy.animations.stop();
 		this.enemy.frame = 0;
 		
+		this.onGame = false;
 		if(this.coins >= 5){//Passou de fase
 			var txtLevelComplete = game.add.text(game.world.centerX,150,'LEVEL COMPLETE',{font:'20px emulogic',fill:'#fff'});
 				txtLevelComplete.anchor.set(.5);
