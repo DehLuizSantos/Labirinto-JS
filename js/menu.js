@@ -1,50 +1,66 @@
-var menuState = {
-	create: function(){
-		this.music = game.add.audio('music');
-		this.music.loop = true;
-		this.music.volume = .5;
-		this.music.play();
+class StartScene extends Phaser.Scene{
+	constructor(){
+		super('Menu')
+	}
+	create(){
+		this.sndMusic = this.sound.add('music');
+		this.sndMusic.play({
+			volume: 0,
+			loop: true
+		})
 		
-		game.global.score = 0;
 		
-		if(!localStorage.getItem('labirinto_highScore')){
+		
+		/* if(!localStorage.getItem('labirinto_highScore')){
 			localStorage.setItem('labirinto_highScore',0);
-		}
+		} */
 		
-		if(game.global.highScore > localStorage.getItem('labirinto_highScore')){
+		/* if(game.global.highScore > localStorage.getItem('labirinto_highScore')){
 			localStorage.setItem('labirinto_highScore',game.global.highScore);
 		} else {
 			game.global.highScore = localStorage.getItem('labirinto_highScore');
-		}
+		} */
 		
-		var txtHighScore = game.add.text(game.world.centerX,350,'HIGH SCORE: ' + game.global.highScore,{font:'20px emulogic',fill:'#D26111'});
-			txtHighScore.anchor.set(.5);
-			txtHighScore.alpha = 0;
+		var txtHighScore = this.add.text(game.config.width / 2,350,'HIGH SCORE: ' + 100,{font:'20px emulogic',fill:'#D26111'});
+			txtHighScore.setOrigin(.5).setAlpha(0)
 		
 	
-		var txtLabirinto = game.add.text(game.world.centerX,150,'LABIRINTO',{font:'40px emulogic',fill:'#fff'});
-			txtLabirinto.anchor.set(.5);
+		var txtLabirinto = this.add.text(game.config.width / 2,150,'LABIRINTO',{font:'40px emulogic',fill:'#fff'});
+			txtLabirinto.setOrigin(.5);
 			
-		var txtPressStart = game.add.text(game.world.centerX,550,'PRESS START',{font:'20px emulogic',fill:'#fff'});
-			txtPressStart.anchor.set(.5);
-			
-		game.add.tween(txtPressStart).to({y:250},1000).start();
+		var txtPressStart = this.add.text(game.config.width / 2,250,'PRESS START',{font:'20px emulogic',fill:'#fff'});
+			txtPressStart.setOrigin(.5);
 		
-		game.time.events.add(1000,function(){
-			game.add.tween(txtHighScore).to({alpha:1},500).to({alpha:0},500).loop().start();
-		
-			var enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-				enterKey.onDown.addOnce(this.startGame,this);
-
-			var enterKeyMobile = game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
-			console.log(enterKeyMobile)
-		},this);
-
-		
-	},
+		this.tweens.add({
+			targets: txtPressStart,
+			to: 250,
+			duration:1000,
+			yoyo: true,
+			loop: -1
 	
-	startGame: function(){
-		this.music.stop();
-		game.state.start('stage1');
+		});
+		
+			this.tweens.add({
+				targets: txtHighScore,
+				alphaTopLeft: { value: 1, duration: 500, ease: 'Power1' },
+				alphaBottomRight: { value: 1, duration: 500, ease: 'Power1' },
+				alphaBottomLeft: { value: 1, duration: 500, ease: 'Power1', delay: 500 },				
+				yoyo: true,
+				loop: -1
+		
+			});
+		
+			this.input.keyboard.addKey('enter')
+				.on('down',()=>{
+					this.scene.start('Scene01')
+			})
+
+		
 	}
-};
+	
+	startGame(){
+		this.music.stop();
+		this.scene.start('Stage1');
+	}
+}
+

@@ -1,19 +1,19 @@
-var stage1State = {
-	create: function(){
+class Scene01 extends Phaser.Scene{
+	constructor(){
+		super('Scene01')
 		this.onGame = true;
+	}
+	create(){
 		//Música e sons
-		this.music = game.add.audio('music');
-		this.music.loop = true;
-		this.music.volume = .5;
-		this.music.play();
+		this.onGame = true;
+		this.catchingCoin = false
+		this.sndCoin = this.sound.add('getitem');
 		
-		this.sndCoin = game.add.audio('getitem');
-		this.sndCoin.volume = .5;
+		this.sndLoseCoin = this.sound.add('loseitem');	
 		
-		this.sndLoseCoin = game.add.audio('loseitem');
-		this.sndLoseCoin.volume = .5;
-		
-		game.add.sprite(0,0,'bg');
+		this.bg = this.add.image(0,0,'bg').setOrigin(0)
+		this.bg.displayWidth = 750
+		this.bg.displayHeight = 500
 		
 		this.maze = [
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -28,9 +28,8 @@ var stage1State = {
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 		];
 		
-		this.blocks = game.add.group();
-		this.blocks.enableBody = true;
-		
+		this.blocks = this.physics.add.group();
+		this.blocks.enableBody = true		
 		this.coinPositions = [];
 		
 		for(var row in this.maze){
@@ -41,17 +40,17 @@ var stage1State = {
 				var y = row * 50;
 				
 				if(tile === 1){
-					var block = this.blocks.create(x,y,'block');
+						var block = this.blocks.create(x,y,'block');
+						this.physics.world.enable(block)
 						block.body.immovable = true;
 				} else
 				if(tile === 2){
-					this.player = game.add.sprite(x + 25,y + 25,'player');
-					this.player.anchor.set(.5);
-					game.physics.arcade.enable(this.player);
-					this.player.animations.add('goDown',[0,1,2,3,4,5,6,7],12,true);
-					this.player.animations.add('goUp',[8,9,10,11,12,13,14,15],12,true);
-					this.player.animations.add('goLeft',[16,17,18,19,20,21,22,23],12,true);
-					this.player.animations.add('goRight',[24,25,26,27,28,29,30,31],12,true);
+					this.player = this.add.sprite(x + 25,y + 25,'player');
+					this.player.setOrigin(1);
+					this.player.collideWorldBounds = true
+					this.physics.world.enable(this.player)
+
+				
 				} else
 				if(tile === 3){
 					var position = {
@@ -64,129 +63,115 @@ var stage1State = {
 		}
 		
 		//Inimigo
-		this.enemy = game.add.sprite(75,75,'enemy');
-		this.enemy.anchor.set(.5);
-		game.physics.arcade.enable(this.enemy);
-		this.enemy.animations.add('goDown',[0,1,2,3,4,5,6,7],12,true);
-		this.enemy.animations.add('goUp',[8,9,10,11,12,13,14,15],12,true);
-		this.enemy.animations.add('goLeft',[16,17,18,19,20,21,22,23],12,true);
-		this.enemy.animations.add('goRight',[24,25,26,27,28,29,30,31],12,true);
+		this.enemy = this.add.sprite(75,75,'enemy');
+		this.enemy.setOrigin(1);
+		this.enemy.collideWorldBounds = true	
 		this.enemy.direction = 'DOWN';
+		this.physics.world.enable(this.enemy)
+
 		
 		//Criar a moeda
-		this.coin = {};
+		this.coin = this.physics.add.group();		
 		this.coin.position = this.newPosition();
-		this.coin = game.add.sprite(this.coin.position.x,this.coin.position.y,'coin');
-		this.coin.anchor.set(.5);
-		this.coin.animations.add('spin',[0,1,2,3,4,5,6,7,8,9],10,true).play();
-		game.physics.arcade.enable(this.coin);
+		this.coin = this.add.sprite(position.x,position.y,'coin');
+		this.coin.setOrigin(1);
+		this.coin.collideWorldBounds = true
+		this.physics.world.enable(this.coin)
+		this.coin.play('spin')
+		
+
 		
 		//coletar moeda
 		this.coins = 0;
-		this.txtCoins = game.add.text(15,15,'COINS: ' + this.getText(this.coins),{font:'15px emulogic',fill:'#fff'});
+		this.txtCoins = this.add.text(15,15,'COINS: ' + this.getText(this.coins),{font:'15px emulogic',fill:'#fff'});
 		
 		//exibir score
-		this.txtScore = game.add.text(game.world.centerX,15,'SCORE: ' + this.getText(game.global.score),{font:'15px emulogic',fill:'#fff'});
-		this.txtScore.anchor.set(.5,0);
+		this.txtScore = this.add.text(game.config.width/2 ,15,'SCORE: ' + this.getText(100),{font:'15px emulogic',fill:'#fff'});
+		this.txtScore.setOrigin(.5, 0);
 		
 		//controles
-		this.controls = game.input.keyboard.createCursorKeys();
+		this.controls = this.input.keyboard.createCursorKeys();
 		
-		//Partículas
-		this.emitter = game.add.emitter(0,0,15);
-		this.emitter.makeParticles('part');
-		this.emitter.setXSpeed(-50,50);
-		this.emitter.setYSpeed(-50,50);
-		this.emitter.gravity.y = 0;
-		
-		//Timer
-		this.time = 100;
-		this.txtTimer = game.add.text(game.world.width - 15,15,'TIME: ' + this.getText(this.time),{font:'15px emulogic',fill:'#fff'});
-		this.txtTimer.anchor.set(1,0);
-		this.timer = game.time.events.loop(1000,function(){
-			this.time--;
-			this.txtTimer.text = 'TIME: ' + this.getText(this.time);
-		},this);
-	},
 	
-	update: function(){
-		if(this.onGame){
-			game.physics.arcade.collide(this.player,this.blocks);
-			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
-			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
 		
-			this.moveEnemy();
-			this.movePlayer();
-			
-			if(this.time < 1 || this.coins >= 10){
-				this.gameOver();
+		
+		   //Inicializa o timer
+		this.timer = 10
+		this.txtTimer = this.add.text(window.innerWidth / 2, 15, 'TIME: ' + this.time, {font: '15px emulogic', fill:'#fff'})
+		   
+		this.time.addEvent({
+			delay: 1000,
+			loop:true,
+			callbackScope: this,
+			callback: function(){
+				this.txtTimer.text = 'TIME: ' + this.timer
+				this.timer --
+				if(this.timer < 0){
+					this.timer = 0
+				}
 			}
-		}
-	},
+		   })
+
+
+		
+		this.physics.add.overlap(this.player,this.coin,this.getCoin, null, this);
+		this.physics.add.overlap(this.player,this.enemy,this.loseCoin,null,this);
+		this.physics.add.collider(this.player,this.blocks);		
+	}
 	
-	gameOver: function(){
-		this.onGame = false;
-		
-		game.time.events.remove(this.timer);
-		
-		this.player.body.velocity.x = 0;
-		this.player.body.velocity.y = 0;
-		this.player.animations.stop();
-		this.player.frame = 0;
-		
-		this.enemy.animations.stop();
-		this.enemy.frame = 0;
-		
-		if(this.coins >= 10){//Passou de fase
-			var txtLevelComplete = game.add.text(game.world.centerX,150,'LEVEL COMPLETE',{font:'20px emulogic',fill:'#fff'});
-				txtLevelComplete.anchor.set(.5);
-				
-			var bonus = this.time * 5;
-			game.global.score += bonus;
-			this.txtScore.text = 'SCORE: ' + this.getText(game.global.score);
-			
-			if(game.global.score > game.global.highScore){
-				game.global.highScore = game.global.score;
-			}
-			
-			var txtBonus = game.add.text(game.world.centerX,200,'TIME BONUS: ' + this.getText(bonus),{font:'20px emulogic',fill:'#fff'});
-				txtBonus.anchor.set(.5);
-				
-			var txtFinalScore = game.add.text(game.world.centerX,250,'FINAL SCORE: ' + this.getText(game.global.score),{font:'20px emulogic',fill:'#fff'});
-				txtFinalScore.anchor.set(.5);
-			
-		} else {//Acabou o tempo
-			var txtGameOver = game.add.text(game.world.centerX,150,'GAME OVER',{font:'20px emulogic',fill:'#fff'});
-				txtGameOver.anchor.set(.5);
+	
+	
+
+	timerFunc(){
+		this.timer--;
+		this.txtTimer.text = 'TIME: ' + this.getText(this.timer);
+	}
+	
+	gameOver(){
+		this.onGame = false
+		this.time.addEvent(this.timer).paused = true
+
+		this.player.anims.stop();	
+		this.enemy.anims.stop();	
+	
+		if(this.coins >= 10){
+			var txtLevelComplete = this.add.text(375, 250, "LEVEL COMPLETE", {font:'20px emulogic',fill:'#fff'})
+			txtLevelComplete.setAlign(1)
+			this.time.addEvent({
+				delay:5000,
+				callback: () => {
+					this.sound.pauseAll()
+					this.scene.start('stage2')
+				}
+			})
+		}else{
+			var txtGameOver = this.add.text(game.config.width / 2, 250, "GAME OVER", {font: '20px emulogic', fill: '#fff'})
+			txtGameOver.setAlign(1)
+			this.time.addEvent({
+				delay: 5000,
+				callback: () => {
+					this.sound.pauseAll()
+					this.scene.start('Menu')
+				}
+			})
 		}
 		
-		var txtBestScore = game.add.text(game.world.centerX,350,'BEST SCORE: ' + this.getText(game.global.highScore),{font:'20px emulogic',fill:'#fff'});
-			txtBestScore.anchor.set(.5);
-			
-		game.time.events.add(5000,function(){
-			this.music.stop();
-			if(this.coins >= 10){
-				game.state.start('stage2');
-			} else {
-				game.state.start('menu');
-			}
-		},this);
-	},
+	  }
 	
-	loseCoin: function(){
+	loseCoin(){
 		this.sndLoseCoin.play();
 		
 		if(this.coins > 0){
-			this.emitter.x = this.player.position.x;
+			/* this.emitter.x = this.player.position.x;
 			this.emitter.y = this.player.position.y;
-			this.emitter.start(true,500,null,15);
+			this.emitter.add(particles); */
 			
 			this.coins = 0;
 			this.txtCoins.text = 'COINS: ' + this.getText(this.coins);
 		}
-	},
+	}
 	
-	moveEnemy: function(){
+	moveEnemy(){
 		if(Math.floor(this.enemy.x -25)%50 === 0 && Math.floor(this.enemy.y -25)%50 === 0){
 			var enemyCol = Math.floor(this.enemy.x/50);
 			var enemyRow = Math.floor(this.enemy.y/50);
@@ -211,44 +196,66 @@ var stage1State = {
 		switch(this.enemy.direction){
 			case 'LEFT':
 				this.enemy.x -= 1;
-				this.enemy.animations.play('goLeft');
+				this.enemy.play('goLeftEnemy',true);
 				break;
 			case 'RIGHT':
 				this.enemy.x += 1;
-				this.enemy.animations.play('goRight');
+				this.enemy.play('goRightEnemy',true);
 				break;
 			case 'UP':
 				this.enemy.y -= 1;
-				this.enemy.animations.play('goUp');
+				this.enemy.play('goUpEnemy',true);
 				break;
 			case 'DOWN':
 				this.enemy.y += 1;
-				this.enemy.animations.play('goDown');
+				this.enemy.play('goDownEnemy',true);
 				break;
 			
 		}
-	},
+	}
+
+	explode(pos){
+		this.particles = this.add.particles('part')
+		this.emitter = this.particles.createEmitter({			
+			speed:20,
+			maxParticles: 10,
+        	lifespan: { min: 500, max: 600 },
+			alpha: { start: 1, end: 0 },			
+			x: pos.x,
+			y:pos.y
+		})
+	}
 	
-	getCoin: function(){
-		this.emitter.x = this.coin.position.x;
-		this.emitter.y = this.coin.position.y;
-		this.emitter.start(true,500,null,15);
-		
+	getCoin(){
+		if(this.catchingCoin){		
+			return	
+		}	
+		this.coin.alpha = 0
+		this.explode({x: this.coin.x, y: this.coin.y})
 		this.sndCoin.play();
 		this.coins++;
 		this.txtCoins.text = 'COINS: ' + this.getText(this.coins);
+		this.catchingCoin = true
+		this.repositeCoin(this.newPosition())
 		
-		game.global.score += 5;
-		this.txtScore.text = 'SCORE: ' + this.getText(game.global.score);
+		// game.global.score += 5;
+		// this.txtScore.text = 'SCORE: ' + this.getText(game.global.score);
 		
-		if(game.global.score > game.global.highScore){
-			game.global.highScore = game.global.score;
-		}
-		
-		this.coin.position = this.newPosition();
-	},
+		// if(game.global.score > game.global.highScore){
+		// 	game.global.highScore = game.global.score;
+		// }		
+	}
+
+	repositeCoin(pos){	
+		this.coin = this.add.sprite(pos.x,pos.y,'coin');		
+		this.coin.setOrigin(1);
+		this.coin.collideWorldBounds = true
+		this.physics.world.enable(this.coin)
+		this.coin.play('spin')
+		this.coin.alpha = 1
+	}
 	
-	getText: function(value){
+	getText(value){
 		if(value < 10){
 			return '00' + value.toString();
 		}
@@ -256,12 +263,12 @@ var stage1State = {
 			return '0' + value.toString();
 		}
 		return value.toString();
-	},
+	}
 	
-	movePlayer: function(){
+	movePlayer(){
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
-	
+		
 		if(this.controls.left.isDown && !this.controls.right.isDown){
 			this.player.body.velocity.x = -100;
 			this.player.direction = "left";
@@ -282,27 +289,39 @@ var stage1State = {
 		
 		switch(this.player.direction){
 			case "left":
-				this.player.animations.play('goLeft'); break;
+				this.player.play('goLeft', true); break;
 			case "right":
-				this.player.animations.play('goRight'); break;
+				this.player.play('goRight', true); break;
 			case "up":
-				this.player.animations.play('goUp'); break;
+				this.player.play('goUp', true); break;
 			case "down":
-				this.player.animations.play('goDown'); break;
+				this.player.play('goDown', true); break;
 		}
 		
 		if(this.player.body.velocity.x === 0 && this.player.body.velocity.y === 0){
-			this.player.animations.stop();
+			this.player.anims.stop();
 		}
-	},
+	}
 	
-	newPosition: function(){
+	newPosition(){	
 		var pos = this.coinPositions[Math.floor(Math.random() * this.coinPositions.length)];
 		
 		while(this.coin.position === pos){
 			pos = this.coinPositions[Math.floor(Math.random() * this.coinPositions.length)];
 		}
-		
 		return pos;
 	}
-};
+
+	update(){
+		if(this.onGame){		
+			this.moveEnemy();
+			this.movePlayer();
+			
+			if(this.timer === 0 || this.coins >= 10){
+				this.gameOver();
+			}
+			
+		}
+	}
+}
+

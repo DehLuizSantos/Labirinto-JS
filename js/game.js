@@ -1,15 +1,18 @@
-var game = new Phaser.Game(750,500,Phaser.CANVAS);
+let game
 
-	game.global = {
-		score: 0,
-		highScore: 0
-	};
+window.onload = function(){
+	const config = {
+		type: Phaser.Canvas,
+		width: 720,
+		height: 475,
+		global:{
+			score: 0
+		},
+		scene: [Preload,StartScene,Scene01,Scene02,EndScene],		
+		physics: {
+			default: 'arcade'			
+		},
+	}
 
-	game.state.add('boot',bootState);
-	game.state.add('load',loadState);
-	game.state.add('menu',menuState);
-	game.state.add('stage1',stage1State);
-	game.state.add('stage2',stage2State);
-	game.state.add('end',endState);
-	
-	game.state.start('boot');
+	game = new Phaser.Game(config)
+}

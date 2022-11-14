@@ -13,8 +13,3 @@ body{
 	src: url('emulogic.ttf');
 }
 
-.hidden{
-	font-family: emulogic;
-	visibility: hidden;
-	position: absolute;
-}
