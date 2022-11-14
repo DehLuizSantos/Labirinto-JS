@@ -15,6 +15,7 @@ var stage1State = {
 		
 		game.add.sprite(0,0,'bg');
 		
+		//Labirinto
 		this.maze = [
 			[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -76,26 +77,11 @@ var stage1State = {
 			}
 		}
 
-			//GamePadMobile
-			// Add the VirtualGamepad plugin to the game
+		if(!game.device.desktop){
+			this.renderJoystick()
+		}
 
-			this.right = game.add.button(game.world.width / 2 + 60, 680, 'right')
-			this.right.anchor.set(0.5);
-			this.right.events.onInputDown.add(this.movePlayerJoystick, this)
-
-			this.left = game.add.button(game.world.width / 2 - 60, 680, 'left')
-			this.left.anchor.set(0.5);
-			this.left.events.onInputDown.add(this.movePlayerJoystick, this)
-
-			this.up = game.add.button(game.world.width / 2, 630, 'up')
-			this.up.anchor.set(0.5);
-			this.up.events.onInputDown.add(this.movePlayerJoystick, this)
-
-			this.down = game.add.button(game.world.width / 2, 730, 'down')
-			this.down.anchor.set(0.5);
-			this.down.events.onInputDown.add(this.movePlayerJoystick, this)
-
-		
+	
 		//Inimigo
 		this.enemy = game.add.sprite(75,75,'enemy');
 		this.enemy.anchor.set(.5);
@@ -142,9 +128,6 @@ var stage1State = {
 			this.txtTimer.text = 'TIME: ' + this.getText(this.time);
 		},this);
 	},
-
-	
-
 	
 	update: function(){
 		if(this.onGame){
@@ -152,7 +135,12 @@ var stage1State = {
 			game.physics.arcade.overlap(this.player,this.coin,this.getCoin,null,this);
 			game.physics.arcade.overlap(this.player,this.enemy,this.loseCoin,null,this);
 			this.moveEnemy();
-			// this.movePlayer()
+
+
+			if(game.device.desktop){
+				this.movePlayer()
+			}
+			
 
 			
 			if(this.time === 0 || this.coins >= 10){
@@ -165,6 +153,25 @@ var stage1State = {
 			this.player.animations.play('goDown')
 			this.player.animations.stop()
 		}
+	},
+
+	renderJoystick: function(){
+		//GamePad
+		this.right = game.add.button(game.world.width / 2 + 60, 680, 'right')
+		this.right.anchor.set(0.5);
+		this.right.events.onInputDown.add(this.movePlayerJoystick, this)
+
+		this.left = game.add.button(game.world.width / 2 - 60, 680, 'left')
+		this.left.anchor.set(0.5);
+		this.left.events.onInputDown.add(this.movePlayerJoystick, this)
+
+		this.up = game.add.button(game.world.width / 2, 630, 'up')
+		this.up.anchor.set(0.5);
+		this.up.events.onInputDown.add(this.movePlayerJoystick, this)
+
+		this.down = game.add.button(game.world.width / 2, 730, 'down')
+		this.down.anchor.set(0.5);
+		this.down.events.onInputDown.add(this.movePlayerJoystick, this)
 	},
 
 	movePlayerJoystick: function(direction){
@@ -182,9 +189,7 @@ var stage1State = {
 		}
 		if(direction.key === 'down' && direction.key !== 'up'){
 			this.player.body.velocity.y = 100
-		}
-
-		
+		}		
 	
 		switch(direction.key){
 			case "left":
@@ -200,9 +205,8 @@ var stage1State = {
 	},
 
 	movePlayer: function(){
-		this.player.body.velocity.x = 0;
-		this.player.body.velocity.y = 0;
-	
+		this.player.body.velocity.x = 0
+		this.player.body.velocity.y = 0
 		if(this.controls.left.isDown && !this.controls.right.isDown){
 			this.player.body.velocity.x = -100;
 			this.player.direction = "left";
@@ -273,13 +277,11 @@ var stage1State = {
 			case 'DOWN':
 				this.enemy.y += 1;
 				this.enemy.animations.play('goDown');
-				break;
-			
+				break;			
 		}
 	},
 	
-	gameOver: function(){
-		
+	gameOver: function(){		
 		game.time.events.remove(this.timer);
 		
 		this.player.body.velocity.x = 0;
@@ -341,8 +343,6 @@ var stage1State = {
 		}
 	},
 	
-	
-	
 	getCoin: function(){
 		this.emitter.x = this.coin.position.x;
 		this.emitter.y = this.coin.position.y;
@@ -372,8 +372,6 @@ var stage1State = {
 		return value.toString();
 	},
 	
-	
-	
 	newPosition: function(){
 		var pos = this.coinPositions[Math.floor(Math.random() * this.coinPositions.length)];
 		
@@ -384,5 +382,6 @@ var stage1State = {
 		return pos;
 	}
 };
+
 
 
