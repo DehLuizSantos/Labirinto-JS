@@ -66,32 +66,29 @@ var stage1State = {
 				}
 			}
 		}
-		if(game.device.android || game.device.iPhone){
+		/* if(game.device.android || game.device.iPhone){ */
 			//GamePadMobile
 			// Add the VirtualGamepad plugin to the game
-			this.gamepad = this.game.plugins.add(Phaser.Plugin.VirtualGamepad);
-			
-			// Add a joystick to the game (only one is allowed right now)
-			this.joystick = this.gamepad.addJoystick(game.world.width / 2, game.world.height / 2, 1.2, 'gamepad');
-			this.joystick.visible = false
-		
-			
-			this.joystick.anchor.set(0.5);
-			
-				
-			// Add a button to the game (only one is allowed right now)
-			this.button = this.gamepad.addButton(game.world.centerX, game.world.centerY, 1.0, 'gamepad');
-			this.button.anchor.set(0.5);
-			this.button.visible = false
-			this.player.body.acceleration.x = 4 * this.joystick.properties.x;
-			this.player.body.acceleration.y = 4 * this.joystick.properties.y;
+	
 
-			this.right = game.add.button(25 , game.world.height / 2, 'right')
-
+			this.right = game.add.button(725 , game.world.height / 2, 'right')
 			this.right.anchor.set(0.5);
-
 			this.right.events.onInputDown.add(this.movePlayerJoystick, this)
-		}
+
+			this.left = game.add.button(25, game.world.height / 2, 'left')
+			this.left.anchor.set(0.5);
+			this.left.events.onInputDown.add(this.movePlayerJoystick, this)
+
+			this.up = game.add.button(game.world.width / 2, 40, 'up')
+			this.up.anchor.set(0.5);
+			this.up.events.onInputDown.add(this.movePlayerJoystick, this)
+
+			this.down = game.add.button(game.world.width / 2, 475, 'down')
+			this.down.anchor.set(0.5);
+			this.down.events.onInputDown.add(this.movePlayerJoystick, this)
+
+
+		/* } */
 
 		
 
@@ -157,14 +154,7 @@ var stage1State = {
 			if(this.time === 0 || this.coins >= 10){
 				this.gameOver();
 			}
-			// Read joystick data to set ship's angle and acceleration
-			if(game.device.android || game.device.iPhone){
-				if(this.joystick.properties.inUse){
-					this.movePlayerJoystick()
-				}
-			}else{
-				this.movePlayer();
-			}
+			
 		}else{
 			this.player.body.velocity.x = 0
 			this.player.body.velocity.y = 0
@@ -173,28 +163,27 @@ var stage1State = {
 		}
 	},
 
-	movePlayerJoystick: function(){		
+	movePlayerJoystick: function(direction){
+		console.log(direction)
 		this.player.body.velocity.x = 0
 		this.player.body.velocity.y = 0
 
-		
-		if(this.joystick.properties.left && !this.joystick.properties.right){
-			this.player.body.velocity.x = -100
-			this.player.direction = "left";
-		}else
-		if(this.joystick.properties.right && !this.joystick.properties.left){
+		if(direction.key === 'right' && direction.key !== 'left'){
 			this.player.body.velocity.x = 100
-			this.player.direction = "right";
-		}else
-		if(this.joystick.properties.up && !this.joystick.properties.down){
-			this.player.body.velocity.y = -100
-			this.player.direction = "up";
-		}else
-		if(this.joystick.properties.down && !this.joystick.properties.up){
-			this.player.body.velocity.y = 100
-			this.player.direction = "down";
 		}
-		switch(this.player.direction){
+		if(direction.key === 'left' && direction.key !== 'right'){
+			this.player.body.velocity.x = -100
+		}
+		if(direction.key === 'up' && direction.key !== 'down'){
+			this.player.body.velocity.y = -100
+		}
+		if(direction.key === 'down' && direction.key !== 'up'){
+			this.player.body.velocity.y = 100
+		}
+
+		
+	
+		switch(direction.key){
 			case "left":
 				this.player.animations.play('goLeft', true); break;
 			case "right":

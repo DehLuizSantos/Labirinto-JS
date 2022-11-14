@@ -12,7 +12,10 @@ var loadState = {
         game.load.image('block', 'img/block.png')
         game.load.image('end', 'img/end.png')
         game.load.image('part', 'img/part.png')
-        game.load.image('right', 'img/seta.png')
+        game.load.image('right', 'img/right.png')
+        game.load.image('left', 'img/left.png')
+        game.load.image('up', 'img/up.png')
+        game.load.image('down', 'img/down.png')
 
 
         //Carregamento de imagem por celula (dimenções alt/larg)
