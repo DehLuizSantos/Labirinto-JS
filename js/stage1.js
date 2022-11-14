@@ -6,8 +6,6 @@ var stage1State = {
 		this.music.loop = true;
 		this.music.volume = .5;
 		this.music.play();
-
-		
 		
 		this.sndCoin = game.add.audio('getitem');
 		this.sndCoin.volume = .5;
@@ -67,11 +65,12 @@ var stage1State = {
 			}
 		}
 		/* if(game.device.android || game.device.iPhone){ */
+
 			//GamePadMobile
 			// Add the VirtualGamepad plugin to the game
 	
 
-			this.right = game.add.button(725 , game.world.height / 2, 'right')
+			this.right = game.add.button(725, game.world.height / 2, 'right')
 			this.right.anchor.set(0.5);
 			this.right.events.onInputDown.add(this.movePlayerJoystick, this)
 
@@ -131,7 +130,7 @@ var stage1State = {
 		this.emitter.gravity.y = 0;
 		
 		//Timer
-		this.time = 50;
+		this.time = 1000;
 		this.txtTimer = game.add.text(game.world.width - 15,15,'TIME: ' + this.getText(this.time),{font:'15px emulogic',fill:'#fff'});
 		this.txtTimer.anchor.set(1,0);
 		this.timer = game.time.events.loop(1000,function(){
@@ -164,11 +163,11 @@ var stage1State = {
 	},
 
 	movePlayerJoystick: function(direction){
-		console.log(direction)
+		console.log(game.world)
 		this.player.body.velocity.x = 0
 		this.player.body.velocity.y = 0
 
-		if(direction.key === 'right' && direction.key !== 'left'){
+ 		if(direction.key === 'right' && direction.key !== 'left'){
 			this.player.body.velocity.x = 100
 		}
 		if(direction.key === 'left' && direction.key !== 'right'){
