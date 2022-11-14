@@ -75,7 +75,6 @@ var stage1State = {
 				}
 			}
 		}
-		if(game.device.android || game.device.iPhone){
 
 			//GamePadMobile
 			// Add the VirtualGamepad plugin to the game
@@ -95,12 +94,6 @@ var stage1State = {
 			this.down = game.add.button(game.world.width / 2, 730, 'down')
 			this.down.anchor.set(0.5);
 			this.down.events.onInputDown.add(this.movePlayerJoystick, this)
-
-		
-			
-		}
-
-		
 
 		
 		//Inimigo
