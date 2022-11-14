@@ -163,7 +163,6 @@ var stage1State = {
 	},
 
 	movePlayerJoystick: function(direction){
-		console.log(game.world)
 		this.player.body.velocity.x = 0
 		this.player.body.velocity.y = 0
 
