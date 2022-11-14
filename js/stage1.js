@@ -29,7 +29,9 @@ var stage1State = {
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
 			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
+
 		];
 		
 		this.blocks = game.add.group();
@@ -78,19 +80,19 @@ var stage1State = {
 			//GamePadMobile
 			// Add the VirtualGamepad plugin to the game
 
-			this.right = game.add.button(game.world.width / 2 + 50, 650, 'right')
+			this.right = game.add.button(game.world.width / 2 + 60, 680, 'right')
 			this.right.anchor.set(0.5);
 			this.right.events.onInputDown.add(this.movePlayerJoystick, this)
 
-			this.left = game.add.button(game.world.width / 2 - 50, 650, 'left')
+			this.left = game.add.button(game.world.width / 2 - 60, 680, 'left')
 			this.left.anchor.set(0.5);
 			this.left.events.onInputDown.add(this.movePlayerJoystick, this)
 
-			this.up = game.add.button(game.world.width / 2, 610, 'up')
+			this.up = game.add.button(game.world.width / 2, 630, 'up')
 			this.up.anchor.set(0.5);
 			this.up.events.onInputDown.add(this.movePlayerJoystick, this)
 
-			this.down = game.add.button(game.world.width / 2, 690, 'down')
+			this.down = game.add.button(game.world.width / 2, 730, 'down')
 			this.down.anchor.set(0.5);
 			this.down.events.onInputDown.add(this.movePlayerJoystick, this)
 
