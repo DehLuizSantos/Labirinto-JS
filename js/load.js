@@ -10,6 +10,8 @@ var loadState = {
 
         game.load.image('bg','img/bg.png')
         game.load.image('block', 'img/block.png')
+        game.load.image('whitearea', 'img/white-area.png')
+        game.load.image('blackarea', 'img/black-area.png')
         game.load.image('end', 'img/end.png')
         game.load.image('part', 'img/part.png')
         game.load.image('right', 'img/right.png')

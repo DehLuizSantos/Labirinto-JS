@@ -16,6 +16,7 @@ var stage1State = {
 		game.add.sprite(0,0,'bg');
 		
 		this.maze = [
+			[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 			[1,3,0,0,0,0,0,0,0,0,0,0,0,3,1,1],
 			[1,0,1,1,0,1,0,1,1,1,0,1,1,0,1,1],
@@ -27,6 +28,8 @@ var stage1State = {
 			[1,3,0,0,0,0,0,3,1,0,0,0,0,3,1,1],
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 			[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+			[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
 		];
 		
 		this.blocks = game.add.group();
@@ -62,32 +65,37 @@ var stage1State = {
 					};
 					this.coinPositions.push(position);
 				}
+				if(tile === 4){
+					this.cursorsMobile = game.add.sprite(x,y, 'whitearea')
+				}
+				if(tile === 5){
+					this.header = game.add.sprite(x,y, 'blackarea')
+				}
 			}
 		}
 		if(game.device.android || game.device.iPhone){
 
 			//GamePadMobile
 			// Add the VirtualGamepad plugin to the game
-	
 
-			this.right = game.add.button(725, game.world.height / 2, 'right')
+			this.right = game.add.button(game.world.width / 2 + 50, 650, 'right')
 			this.right.anchor.set(0.5);
 			this.right.events.onInputDown.add(this.movePlayerJoystick, this)
-			console.log(this.right)
 
-			this.left = game.add.button(25, game.world.height / 2, 'left')
+			this.left = game.add.button(game.world.width / 2 - 50, 650, 'left')
 			this.left.anchor.set(0.5);
 			this.left.events.onInputDown.add(this.movePlayerJoystick, this)
 
-			this.up = game.add.button(game.world.width / 2, 40, 'up')
+			this.up = game.add.button(game.world.width / 2, 610, 'up')
 			this.up.anchor.set(0.5);
 			this.up.events.onInputDown.add(this.movePlayerJoystick, this)
 
-			this.down = game.add.button(game.world.width / 2, 475, 'down')
+			this.down = game.add.button(game.world.width / 2, 690, 'down')
 			this.down.anchor.set(0.5);
 			this.down.events.onInputDown.add(this.movePlayerJoystick, this)
 
-
+		
+			
 		}
 
 		
